@@ -170,13 +170,13 @@ class Test24HourEditWindowRegression:
             faculty = Faculty.query.first()
             class_obj = Class.query.filter_by(faculty_id=faculty.id).first()
             
-            # Create session from 25 hours ago
-            old_date = (datetime.now() - timedelta(hours=25)).date()
+            # Create a session whose end timestamp is truly 25 hours ago
+            end_dt = datetime.now() - timedelta(hours=25)
             old_session = AttendanceSession(
                 class_id=class_obj.id,
-                date=old_date,
-                start_time=time(8, 0),
-                end_time=time(9, 0),
+                date=end_dt.date(),
+                start_time=(end_dt - timedelta(hours=1)).time(),
+                end_time=end_dt.time(),
                 created_by=faculty.user_id
             )
             db.session.add(old_session)
