@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Courses - SAMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="bi bi-book"></i> Manage Courses</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{{ url_for('admin_add_course') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Course
+        </a>
+    </div>
+</div>
+
+{% for department, courses in courses_by_dept.items() %}
+<div class="card mb-4">
+    {% if department == 'Computer Science' %}
+    <div class="card-header" style="background-color: #0d6efd; color: white;">
+        <h5 class="mb-0" style="color: white;">
+            <i class="bi bi-buildings"></i> {{ department }} 
+            <span class="badge bg-light text-dark">{{ courses|length }} courses</span>
+        </h5>
+    </div>
+    {% else %}
+    <div class="card-header" style="background-color: #198754; color: white;">
+        <h5 class="mb-0" style="color: white;">
+            <i class="bi bi-buildings"></i> {{ department }} 
+            <span class="badge bg-light text-dark">{{ courses|length }} courses</span>
+        </h5>
+    </div>
+    {% endif %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                {% if department == 'Computer Science' %}
+                <thead style="background-color: #cfe2ff;">
+                    <tr>
+                        <th width="15%" style="color: #084298;">Course Code</th>
+                        <th width="35%" style="color: #084298;">Course Name</th>
+                        <th width="10%" style="color: #084298;">Credits</th>
+                        <th width="10%" style="color: #084298;">Year</th>
+                        <th width="10%" style="color: #084298;">Semester</th>
+                        <th width="20%" style="color: #084298;">Info</th>
+                    </tr>
+                </thead>
+                {% else %}
+                <thead style="background-color: #d1e7dd;">
+                    <tr>
+                        <th width="15%" style="color: #0f5132;">Course Code</th>
+                        <th width="35%" style="color: #0f5132;">Course Name</th>
+                        <th width="10%" style="color: #0f5132;">Credits</th>
+                        <th width="10%" style="color: #0f5132;">Year</th>
+                        <th width="10%" style="color: #0f5132;">Semester</th>
+                        <th width="20%" style="color: #0f5132;">Info</th>
+                    </tr>
+                </thead>
+                {% endif %}
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td><strong class="text-primary">{{ course.course_code }}</strong></td>
+                        <td>{{ course.course_name }}</td>
+                        <td><span class="badge bg-info">{{ course.credits }}</span></td>
+                        <td>Year {{ course.year }}</td>
+                        <td>Sem {{ course.semester }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ department }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Summary Card -->
+<div class="card">
+    <div class="card-header" style="background-color: #212529; color: white;">
+        <h5 class="mb-0" style="color: white;"><i class="bi bi-bar-chart"></i> Course Statistics</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            {% for department, courses in courses_by_dept.items() %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="mb-0">{{ courses|length }}</h3>
+                        <p class="text-muted mb-0">{{ department }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

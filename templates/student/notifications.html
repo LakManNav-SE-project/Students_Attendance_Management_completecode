@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-bell"></i> Notifications</h2>
+<div class="card">
+    <div class="card-body">
+        {% for notif in notifications %}
+        <div class="alert alert-{{ 'danger' if notif.type == 'low_attendance' else 'info' }}">
+            <h5>{{ notif.title }}</h5>
+            <p>{{ notif.message }}</p>
+            <small class="text-muted">{{ notif.created_at.strftime('%Y-%m-%d %H:%M') if notif.created_at else 'N/A' }}</small>
+        </div>
+        {% else %}
+        <p class="text-muted">No notifications</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

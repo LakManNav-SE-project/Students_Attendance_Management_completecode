@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard - SAMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-speedometer2"></i> Faculty Dashboard</h2>
+        <p class="text-muted">Welcome back! Here's your overview</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-door-open"></i> My Classes</h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if my_classes %}
+                <div class="list-group list-group-flush">
+                    {% for class in my_classes %}
+                    <a href="{{ url_for('faculty_class_detail', class_id=class.id) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div>
+                                <h6 class="mb-1">{{ class.course.course_code }} - {{ class.course.course_name }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-people"></i> Section {{ class.section }} | 
+                                    <i class="bi bi-clock"></i> {{ class.schedule }}
+                                </small>
+                            </div>
+                            <span class="badge bg-primary align-self-start">{{ class.room }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No classes assigned</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-light text-center">
+                <a href="{{ url_for('faculty_classes') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye"></i> View All Classes
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-today"></i> Today's Sessions</h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if today_sessions %}
+                <div class="list-group list-group-flush">
+                    {% for session in today_sessions %}
+                    <a href="{{ url_for('faculty_session_detail', session_id=session.id) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <div>
+                                <h6 class="mb-1">{{ session.class_ref.course.course_name }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> {{ session.start_time.strftime('%H:%M') }} - {{ session.end_time.strftime('%H:%M') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if session.is_active else 'secondary' }} align-self-start">
+                                {{ 'Active' if session.is_active else 'Completed' }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No sessions scheduled for today</p>
+                <div class="text-center">
+                    <a href="{{ url_for('faculty_create_session') }}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Create Session
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('faculty_create_session') }}" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-plus-circle d-block fs-1"></i>
+                            Create Session
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('faculty_classes') }}" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-door-open d-block fs-1"></i>
+                            My Classes
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('faculty_reports') }}" class="btn btn-warning btn-lg w-100">
+                            <i class="bi bi-file-earmark-text d-block fs-1"></i>
+                            View Reports
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_classes') }}" class="btn btn-secondary btn-lg w-100">
+                            <i class="bi bi-gear d-block fs-1"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h3 class="text-primary">{{ my_classes|length }}</h3>
+                        <p class="text-muted">Total Classes</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="text-success">{{ today_sessions|length }}</h3>
+                        <p class="text-muted">Today's Sessions</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h3 class="text-info">
+                            {% set total_students = namespace(count=0) %}
+                            {% for class in my_classes %}
+                                {% set total_students.count = total_students.count + class.enrollments|length %}
+                            {% endfor %}
+                            {{ total_students.count }}
+                        </h3>
+                        <p class="text-muted">Total Students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

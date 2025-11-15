@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Virtual environments
+se/
+.venv/
+venv/
+ENV/
+.env/
+
+# Flask/instance data
+instance/
+*.db
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Tooling
+.vscode/
+.idea/
+
+# Local scripts/logs
+*.log
+
+# Node/JS
+node_modules/

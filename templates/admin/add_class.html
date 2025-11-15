@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Add Class - SAMS{% endblock %}
+{% block content %}
+<div class="row mb-4"><div class="col-md-12"><h2><i class="bi bi-plus-circle"></i> Add New Class</h2></div></div>
+
+<div class="alert alert-info">
+    <h6><i class="bi bi-info-circle"></i> Format Requirements:</h6>
+    <ul class="mb-0">
+        <li><strong>Schedule:</strong> Must be in format: <code>MWF 10:00-11:00</code> (Days in capitals, space, time range with no spaces)</li>
+        <li><strong>Room:</strong> Must be in format: <code>Lab 101</code> or <code>Room 201</code> (Lab/Room, space, exactly 3 digits)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('admin_add_class') }}" id="classForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="course_id" class="form-label">Course *</label>
+                    <select class="form-select" id="course_id" name="course_id" required>
+                        <option value="">Select Course</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.course_code }} - {{ course.course_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="faculty_id" class="form-label">Faculty *</label>
+                    <select class="form-select" id="faculty_id" name="faculty_id" required>
+                        <option value="">Select Faculty</option>
+                        {% for f in faculty %}
+                        <option value="{{ f.id }}">{{ f.user.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="section" class="form-label">Section *</label>
+                    <input type="text" class="form-control" id="section" name="section" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="schedule" class="form-label">Schedule *</label>
+                    <input type="text" class="form-control" id="schedule" name="schedule" placeholder="e.g., MWF 10:00-11:00" required>
+                    <div class="form-text text-danger" id="scheduleError" style="display: none;">
+                        Format must be: Days(uppercase) SPACE Time-Time (e.g., MWF 10:00-11:00)
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="room" class="form-label">Room *</label>
+                    <input type="text" class="form-control" id="room" name="room" placeholder="e.g., Lab 101 or Room 202" required>
+                    <div class="form-text text-danger" id="roomError" style="display: none;">
+                        Format must be: Lab/Room SPACE 3-digits (e.g., Lab 101)
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary" id="submitBtn"><i class="bi bi-check-circle"></i> Create Class</button>
+                <a href="{{ url_for('admin_classes') }}" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scheduleInput = document.getElementById('schedule');
+    const roomInput = document.getElementById('room');
+    const scheduleError = document.getElementById('scheduleError');
+    const roomError = document.getElementById('roomError');
+    const form = document.getElementById('classForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Schedule validation: Must be like "MWF 10:00-11:00"
+    // Pattern: Uppercase letters, space, time-time (no spaces around dash)
+    const schedulePattern = /^[A-Z]+\s\d{2}:\d{2}-\d{2}:\d{2}$/;
+
+    // Room validation: Must be "Lab 101" or "Room 202" (exactly 3 digits)
+    const roomPattern = /^(Lab|Room)\s\d{3}$/;
+
+    function validateSchedule() {
+        const value = scheduleInput.value.trim();
+        if (!value) return true; // Don't validate empty field
+
+        if (!schedulePattern.test(value)) {
+            scheduleError.style.display = 'block';
+            scheduleInput.classList.add('is-invalid');
+            return false;
+        } else {
+            scheduleError.style.display = 'none';
+            scheduleInput.classList.remove('is-invalid');
+            return true;
+        }
+    }
+
+    function validateRoom() {
+        const value = roomInput.value.trim();
+        if (!value) return true; // Don't validate empty field
+
+        if (!roomPattern.test(value)) {
+            roomError.style.display = 'block';
+            roomInput.classList.add('is-invalid');
+            return false;
+        } else {
+            roomError.style.display = 'none';
+            roomInput.classList.remove('is-invalid');
+            return true;
+        }
+    }
+
+    scheduleInput.addEventListener('input', validateSchedule);
+    scheduleInput.addEventListener('blur', validateSchedule);
+    roomInput.addEventListener('input', validateRoom);
+    roomInput.addEventListener('blur', validateRoom);
+
+    form.addEventListener('submit', function(e) {
+        const scheduleValid = validateSchedule();
+        const roomValid = validateRoom();
+
+        if (!scheduleValid || !roomValid) {
+            e.preventDefault();
+            
+            let errorMsg = 'Please fix the following errors:\n\n';
+            if (!scheduleValid) {
+                errorMsg += '• Schedule must be in format: MWF 10:00-11:00\n  (Days in UPPERCASE, space, time range with no spaces)\n\n';
+            }
+            if (!roomValid) {
+                errorMsg += '• Room must be in format: Lab 101 or Room 202\n  (Lab/Room, space, exactly 3 digits)\n';
+            }
+            
+            alert(errorMsg);
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-speedometer2"></i> Student Dashboard</h2>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">My Attendance Summary</h5></div>
+            <div class="card-body">
+                <div class="row">
+                {% for item in attendance_summary %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>{{ item.class.course.course_name }}</h6>
+                                <div class="progress mb-2" style="height: 30px;">
+                                    <div class="progress-bar bg-{{ 'success' if item.percentage >= 75 else 'danger' }}" [style.width.%]="item.percentage">
+                                        {{ item.percentage }}%
+                                    </div>
+                                </div>
+                                <small>{{ item.present }}/{{ item.total }} sessions attended</small><br>
+                                <a href="{{ url_for('student_class_attendance', class_id=item.class.id) }}" class="btn btn-sm btn-primary mt-2">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white"><h5 class="mb-0">Quick Actions</h5></div>
+            <div class="card-body">
+                <a href="{{ url_for('student_attendance') }}" class="btn btn-secondary w-100">
+                    <i class="bi bi-calendar-check"></i> View All Attendance
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white"><h5 class="mb-0">Recent Notifications</h5></div>
+            <div class="card-body">
+                {% for notif in notifications %}
+                <div class="alert alert-{{ 'danger' if notif.type == 'low_attendance' else 'info' }} py-2">
+                    <strong>{{ notif.title }}</strong><br>
+                    <small>{{ notif.message }}</small>
+                </div>
+                {% else %}
+                <p class="text-muted">No notifications</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

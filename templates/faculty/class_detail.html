@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Class Detail - SAMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-door-open"></i> {{ class_obj.course.course_name }}</h2>
+        <h5 class="text-muted">{{ class_obj.course.course_code }} - Section {{ class_obj.section }}</h5>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('faculty_classes') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Classes
+        </a>
+        <a href="{{ url_for('faculty_create_session') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> New Session
+        </a>
+    </div>
+</div>
+
+<!-- Class Info Card -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Class Information</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong><i class="bi bi-book"></i> Course Code:</strong> {{ class_obj.course.course_code }}</p>
+                <p><strong><i class="bi bi-bookmark"></i> Course Name:</strong> {{ class_obj.course.course_name }}</p>
+                <p><strong><i class="bi bi-building"></i> Department:</strong> {{ class_obj.course.department }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong><i class="bi bi-people"></i> Section:</strong> {{ class_obj.section }}</p>
+                <p><strong><i class="bi bi-clock"></i> Schedule:</strong> {{ class_obj.schedule }}</p>
+                <p><strong><i class="bi bi-door-open"></i> Room:</strong> {{ class_obj.room }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Enrolled Students -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Enrolled Students ({{ enrollments|length }})</h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if enrollments %}
+                <div class="list-group list-group-flush">
+                    {% for enrollment in enrollments %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ enrollment.student.user.full_name }}</h6>
+                                <small class="text-muted">{{ enrollment.student.student_id }}</small>
+                            </div>
+                            <span class="badge bg-primary">{{ enrollment.student.section }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No students enrolled yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Recent Sessions</h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if sessions %}
+                <div class="list-group list-group-flush">
+                    {% for session in sessions[:10] %}
+                    <a href="{{ url_for('faculty_session_detail', session_id=session.id) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ session.date.strftime('%B %d, %Y') }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> {{ session.start_time.strftime('%H:%M') }} - {{ session.end_time.strftime('%H:%M') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-{{ 'success' if session.is_active else 'secondary' }}">
+                                {{ 'Active' if session.is_active else 'Completed' }}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No sessions created yet</p>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('faculty_create_session') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Create First Session
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h6 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h6>
+    </div>
+    <div class="card-body">
+        <a href="{{ url_for('faculty_create_session') }}" class="btn btn-primary me-2">
+            <i class="bi bi-plus-circle"></i> Create New Session
+        </a>
+        <a href="{{ url_for('faculty_class_report', class_id=class_obj.id) }}" class="btn btn-success me-2">
+            <i class="bi bi-file-earmark-bar-graph"></i> View Attendance Report
+        </a>
+        <a href="{{ url_for('faculty_export_csv', class_id=class_obj.id) }}" class="btn btn-secondary me-2">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+        </a>
+        <a href="{{ url_for('faculty_export_pdf', class_id=class_obj.id) }}" class="btn btn-danger">
+            <i class="bi bi-file-earmark-pdf"></i> Export PDF
+        </a>
+    </div>
+</div>
+{% endblock %}

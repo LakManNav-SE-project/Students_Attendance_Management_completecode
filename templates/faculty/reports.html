@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - SAMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-file-earmark-text"></i> Attendance Reports</h2>
+        <p class="text-muted">Generate and export attendance reports for your classes</p>
+    </div>
+</div>
+
+{% if classes %}
+<div class="row">
+    {% for class in classes %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">{{ class.course.course_code }}</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">{{ class.course.course_name }}</h6>
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-people"></i> Section {{ class.section }}<br>
+                        <i class="bi bi-door-open"></i> {{ class.room }}<br>
+                        <i class="bi bi-clock"></i> {{ class.schedule }}
+                    </small>
+                </p>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('faculty_class_report', class_id=class.id) }}" class="btn btn-primary">
+                        <i class="bi bi-eye"></i> View Report
+                    </a>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('faculty_export_csv', class_id=class.id) }}" class="btn btn-success btn-sm">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+                        </a>
+                        <a href="{{ url_for('faculty_export_pdf', class_id=class.id) }}" class="btn btn-danger btn-sm">
+                            <i class="bi bi-file-earmark-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <h5><i class="bi bi-info-circle"></i> No Classes Found</h5>
+    <p>You don't have any classes assigned yet. Please contact the administrator.</p>
+</div>
+{% endif %}
+
+<!-- Help Card -->
+<div class="card mt-4">
+    <div class="card-header bg-secondary text-white">
+        <h6 class="mb-0"><i class="bi bi-question-circle"></i> How to Use Reports</h6>
+    </div>
+    <div class="card-body">
+        <ol class="mb-0">
+            <li><strong>View Report:</strong> Click "View Report" to see detailed attendance statistics in your browser</li>
+            <li><strong>Export CSV:</strong> Download a spreadsheet file that can be opened in Excel or Google Sheets</li>
+            <li><strong>Export PDF:</strong> Download a formatted PDF document for printing or sharing</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

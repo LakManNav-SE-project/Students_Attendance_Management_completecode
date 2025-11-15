@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-plus-circle"></i> Create Attendance Session</h2>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" id="sessionForm">
+            <div class="mb-3">
+                <label class="form-label">Class</label>
+                <select class="form-select" name="class_id" required>
+                    {% for class in classes %}
+                    <option value="{{ class.id }}">{{ class.course.course_code }} - {{ class.course.course_name }} (Section {{ class.section }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" name="date" id="sessionDate" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Start Time</label>
+                    <input type="time" class="form-control" name="start_time" id="startTime" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">End Time</label>
+                    <input type="time" class="form-control" name="end_time" id="endTime" required>
+                    <div class="form-text text-danger" id="timeError" style="display: none;">
+                        End time must be after start time
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-check-circle"></i> Create Session
+            </button>
+            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startTimeInput = document.getElementById('startTime');
+    const endTimeInput = document.getElementById('endTime');
+    const timeError = document.getElementById('timeError');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('sessionForm');
+
+    function validateTimes() {
+        if (!startTimeInput.value || !endTimeInput.value) {
+            return true; // Don't validate if either is empty
+        }
+
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
+
+        if (endTime <= startTime) {
+            timeError.style.display = 'block';
+            endTimeInput.classList.add('is-invalid');
+            submitBtn.disabled = true;
+            return false;
+        } else {
+            timeError.style.display = 'none';
+            endTimeInput.classList.remove('is-invalid');
+            submitBtn.disabled = false;
+            return true;
+        }
+    }
+
+    // Auto-adjust end time when start time changes
+    startTimeInput.addEventListener('change', function() {
+        if (this.value && !endTimeInput.value) {
+            // Set end time to 1 hour after start time
+            const [hours, minutes] = this.value.split(':');
+            const endHour = (parseInt(hours) + 1) % 24;
+            endTimeInput.value = String(endHour).padStart(2, '0') + ':' + minutes;
+        }
+        validateTimes();
+    });
+
+    endTimeInput.addEventListener('change', validateTimes);
+    endTimeInput.addEventListener('input', validateTimes);
+
+    form.addEventListener('submit', function(e) {
+        if (!validateTimes()) {
+            e.preventDefault();
+            alert('Please ensure end time is after start time');
+            return false;
+        }
+    });
+
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('sessionDate').value = today;
+});
+</script>
+{% endblock %}

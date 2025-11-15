@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2><i class="bi bi-calendar-check"></i> My Attendance</h2>
+<div class="row">
+{% for enrollment in enrollments %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">{{ enrollment.class_ref.course.course_name }}</div>
+            <div class="card-body">
+                <p><strong>Faculty:</strong> {{ enrollment.class_ref.faculty.user.full_name }}<br>
+                <strong>Section:</strong> {{ enrollment.class_ref.section }}<br>
+                <strong>Schedule:</strong> {{ enrollment.class_ref.schedule }}</p>
+                <a href="{{ url_for('student_class_attendance', class_id=enrollment.class_id) }}" class="btn btn-primary">View Attendance</a>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}

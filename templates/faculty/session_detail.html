@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Session Detail - SAMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-calendar-check"></i> Attendance Session</h2>
+        <p class="text-muted">
+            <strong>Course:</strong> {{ session_obj.class_ref.course.course_code }} - {{ session_obj.class_ref.course.course_name }}<br>
+            <strong>Section:</strong> {{ session_obj.class_ref.section }} | 
+            <strong>Date:</strong> {{ session_obj.date }} | 
+            <strong>Time:</strong> {{ session_obj.start_time.strftime('%H:%M') }} - {{ session_obj.end_time.strftime('%H:%M') }}
+        </p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('faculty_class_detail', class_id=session_obj.class_id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Class
+        </a>
+        <a href="{{ url_for('faculty_mark_attendance_page', session_id=session_obj.id) }}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Edit Attendance
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Attendance List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="10%">#</th>
+                                <th width="20%">Student ID</th>
+                                <th width="40%">Name</th>
+                                <th width="15%">Status</th>
+                                <th width="15%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr id="row-{{ enrollment.student.id }}">
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ enrollment.student.student_id }}</strong></td>
+                                <td>{{ enrollment.student.user.full_name }}</td>
+                                <td>
+                                    <span id="badge-{{ enrollment.student.id }}">
+                                        {% if enrollment.student.id in attendance_records %}
+                                            {% set record = attendance_records[enrollment.student.id] %}
+                                            {% if record.status == 'present' %}
+                                                <span class="badge bg-success">Present</span>
+                                            {% elif record.status == 'absent' %}
+                                                <span class="badge bg-danger">Absent</span>
+                                            {% elif record.status == 'late' %}
+                                                <span class="badge bg-warning">Late</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-secondary">Not Marked</span>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if enrollment.student.id in attendance_records %}
+                                        <span class="text-muted">Marked</span>
+                                    {% else %}
+                                        <span class="text-danger">Not Marked</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="bi bi-bar-chart"></i> Session Statistics</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <h4 class="text-primary mb-0" id="totalCount">{{ enrollments|length }}</h4>
+                        <small>Total Students</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-success mb-0" id="presentCount">0</h4>
+                        <small>Present</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-warning mb-0" id="lateCount">0</h4>
+                        <small>Late</small>
+                    </div>
+                    <div class="col-3">
+                        <h4 class="text-danger mb-0" id="absentCount">0</h4>
+                        <small>Absent</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Update statistics
+    let present = $('.badge.bg-success:contains("Present")').length;
+    let late = $('.badge.bg-warning:contains("Late")').length;
+    let absent = $('.badge.bg-danger:contains("Absent")').length;
+    
+    $('#presentCount').text(present);
+    $('#lateCount').text(late);
+    $('#absentCount').text(absent);
+});
+</script>
+{% endblock %}
