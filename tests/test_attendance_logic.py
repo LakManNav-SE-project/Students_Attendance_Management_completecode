@@ -138,12 +138,13 @@ class TestAttendanceEditingLock:
     def test_cannot_edit_after_24_hours(self, app, init_database):
         """Cannot edit attendance after 24 hours of session end"""
         with app.app_context():
-            # Create session ending 25 hours ago
+            # Create session that ended fully 25 hours ago
+            end_dt = datetime.now() - timedelta(hours=25)
             session = AttendanceSession(
                 class_id=1,
-                date=(datetime.now() - timedelta(hours=25)).date(),
-                start_time=time(8, 0),
-                end_time=time(9, 0),
+                date=end_dt.date(),
+                start_time=(end_dt - timedelta(hours=1)).time(),
+                end_time=end_dt.time(),
                 created_by=2
             )
             db.session.add(session)
