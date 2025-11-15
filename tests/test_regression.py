@@ -3,7 +3,7 @@ Regression Tests - Verify bug fixes remain fixed
 Tests critical bugs that were previously fixed to ensure they don't regress
 """
 import pytest
-from app import db, User, Student, Faculty, Course, Class, Enrollment, AttendanceSession, Attendance, Notification
+from app import db, User, Student, Faculty, Course, Class, Enrollment, AttendanceSession, Attendance
 from datetime import datetime, timedelta, time, date
 from werkzeug.security import generate_password_hash
 
@@ -261,86 +261,6 @@ class TestStatisticsCountingRegression:
         
         # Should iterate over status-badge elements (one per student)
         assert '[id^="status-badge-"]' in stats_function or 'status-badge-' in stats_function
-
-
-class TestLowAttendanceNotificationRegression:
-    """Regression: Verify low attendance notifications work correctly (Feature: <75% notifications)"""
-    
-    def test_notification_created_when_attendance_drops_below_75(self, faculty_client, app):
-        """Marking student absent should create notification if attendance < 75%"""
-        with app.app_context():
-            # Create new student with low attendance
-            user = User(
-                username='low_attend',
-                email='low@test.com',
-                password_hash=generate_password_hash('test123'),
-                role='student',
-                full_name='Low Attendance'
-            )
-            db.session.add(user)
-            db.session.commit()
-            
-            student = Student(
-                user_id=user.id,
-                student_id='LOW01',
-                department='CS',
-                year=1,
-                section='A'
-            )
-            db.session.add(student)
-            db.session.commit()
-            
-            # Enroll in class
-            class_obj = Class.query.first()
-            enrollment = Enrollment(student_id=student.id, class_id=class_obj.id)
-            db.session.add(enrollment)
-            db.session.commit()
-            
-            session = AttendanceSession.query.first()
-            
-            # Mark absent multiple times to get below 75%
-            for i in range(3):
-                att = Attendance(
-                    session_id=session.id,
-                    student_id=student.id,
-                    status='absent',
-                    marked_by=2
-                )
-                db.session.add(att)
-            
-            # Mark present once (25% attendance)
-            att_present = Attendance(
-                session_id=session.id,
-                student_id=student.id,
-                status='present',
-                marked_by=2
-            )
-            db.session.add(att_present)
-            db.session.commit()
-            
-            student_id = student.id
-            user_id = user.id
-            session_id = session.id
-        
-        # Mark another absent (should trigger notification)
-        response = faculty_client.post('/faculty/attendance/mark', data={
-            'session_id': str(session_id),
-            'student_id': str(student_id),
-            'status': 'absent'
-        })
-        
-        assert response.status_code == 200
-        
-        # Check notification was created
-        with app.app_context():
-            notification = Notification.query.filter_by(
-                user_id=user_id,
-                type='low_attendance'
-            ).first()
-            
-            # Notification should exist (unless cooldown prevents it)
-            # At minimum, verify no error occurred
-            assert True  # System didn't crash
 
 
 class TestPasswordChangeRegression:

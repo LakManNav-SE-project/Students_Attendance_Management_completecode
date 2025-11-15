@@ -1,9 +1,9 @@
 """
 Test Suite for Student Functionality
-Tests: Viewing attendance, notifications, profile
+Tests: Viewing attendance, profile
 """
 import pytest
-from app import db, User, Student, Notification, Attendance, AttendanceSession
+from app import db, User, Student, Attendance, AttendanceSession
 
 
 class TestStudentAuthentication:
@@ -46,33 +46,6 @@ class TestStudentAttendanceViewing:
                 class_id = student.enrollments[0].class_id
                 response = student_client.get(f'/student/attendance/{class_id}')
                 assert response.status_code == 200
-
-
-class TestStudentNotifications:
-    """Test student notification system"""
-    
-    def test_view_notifications(self, student_client):
-        """Student can view their notifications"""
-        response = student_client.get('/student/notifications')
-        assert response.status_code == 200
-    
-    def test_low_attendance_notification_created(self, student_client, app):
-        """Notification created for student with low attendance"""
-        with app.app_context():
-            student = Student.query.first()
-            
-            # Create low attendance notification
-            notification = Notification(
-                user_id=student.user_id,
-                title='Low Attendance Alert',
-                message='Your attendance is below 75%',
-                type='low_attendance'
-            )
-            db.session.add(notification)
-            db.session.commit()
-            
-            notif_count = Notification.query.filter_by(user_id=student.user_id).count()
-            assert notif_count > 0
 
 
 class TestStudentDashboard:

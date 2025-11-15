@@ -1,9 +1,9 @@
 """
 Test Suite for Attendance Business Logic
-Tests: Attendance calculation, notifications, 24-hour lock
+Tests: Attendance calculation, 24-hour lock
 """
 import pytest
-from app import db, User, Student, Faculty, Attendance, AttendanceSession, Notification, Class, calculate_attendance_percentage, can_edit_attendance
+from app import db, User, Student, Faculty, Attendance, AttendanceSession, Class, calculate_attendance_percentage, can_edit_attendance
 from datetime import datetime, timedelta, time, date
 
 
@@ -60,59 +60,6 @@ class TestAttendanceCalculation:
             
             percentage = calculate_attendance_percentage(student.id, class_obj.id)
             assert percentage == 60.0
-
-
-class TestLowAttendanceNotifications:
-    """Test automatic notification system for low attendance"""
-    
-    def test_notification_sent_below_75_percent(self, app, init_database):
-        """Notification sent when attendance drops below 75%"""
-        with app.app_context():
-            student = Student.query.first()
-            
-            # Create notification
-            notification = Notification(
-                user_id=student.user_id,
-                title='Low Attendance Alert',
-                message='Your attendance has dropped below 75%',
-                type='low_attendance'
-            )
-            db.session.add(notification)
-            db.session.commit()
-            
-            notif = Notification.query.filter_by(
-                user_id=student.user_id,
-                type='low_attendance'
-            ).first()
-            
-            assert notif is not None
-            assert '75%' in notif.message
-    
-    def test_no_duplicate_notifications_within_7_days(self, app, init_database):
-        """Should not send multiple notifications within 7 days"""
-        with app.app_context():
-            student = Student.query.first()
-            
-            # Create first notification
-            notif1 = Notification(
-                user_id=student.user_id,
-                title='Low Attendance Alert',
-                message='Test',
-                type='low_attendance',
-                created_at=datetime.utcnow()
-            )
-            db.session.add(notif1)
-            db.session.commit()
-            
-            # Check if recent notification exists
-            recent = Notification.query.filter_by(
-                user_id=student.user_id,
-                type='low_attendance'
-            ).filter(
-                Notification.created_at >= datetime.utcnow() - timedelta(days=7)
-            ).first()
-            
-            assert recent is not None
 
 
 class TestAttendanceEditingLock:

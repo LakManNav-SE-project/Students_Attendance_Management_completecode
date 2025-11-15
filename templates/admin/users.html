@@ -138,7 +138,7 @@
                         <td><small>{{ student.user.email }}</small></td>
                         <td><small>{{ student.parent_email or 'N/A' }}</small></td>
                         <td>
-                            <form method="POST" action="{{ url_for('admin_delete_user', user_id=student.user_id) }}" style="display:inline;" onsubmit="return confirm('⚠️ WARNING!\n\nAre you sure you want to delete student {{ student.student_id }} ({{ student.user.full_name }})?\n\nThis will:\n- Delete their user account\n- Delete their student profile\n- Delete ALL their attendance records\n- Delete ALL their enrollments\n- Delete ALL their notifications\n\nThis action CANNOT be undone!');">
+                            <form method="POST" action="{{ url_for('admin_delete_user', user_id=student.user_id) }}" style="display:inline;" onsubmit="return confirm('⚠️ WARNING!\n\nAre you sure you want to delete student {{ student.student_id }} ({{ student.user.full_name }})?\n\nThis will:\n- Delete their user account\n- Delete their student profile\n- Delete ALL their attendance records\n- Delete ALL their enrollments\n\nThis action CANNOT be undone!');">
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>

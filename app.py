@@ -136,17 +136,6 @@ class Attendance(db.Model):
     session = db.relationship('AttendanceSession', backref='attendance_records')
     student = db.relationship('Student', backref='attendance_records')
 
-class Notification(db.Model):
-    __tablename__ = 'notifications'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    type = db.Column(db.String(20))
-    is_read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user = db.relationship('User', backref='notifications')
-
 class AuditLog(db.Model):
     __tablename__ = 'audit_logs'
     id = db.Column(db.Integer, primary_key=True)
@@ -480,9 +469,6 @@ def admin_delete_user(user_id):
                 # Note: We don't delete classes, just the faculty profile
                 # Classes will need to be reassigned to another faculty manually
                 db.session.delete(faculty)
-        
-        # Delete notifications (references user_id)
-        Notification.query.filter_by(user_id=user_id).delete()
         
         # Delete audit logs for this user (references user_id)
         AuditLog.query.filter_by(user_id=user_id).delete()
@@ -953,22 +939,6 @@ def faculty_mark_attendance():
         
         db.session.commit()
         
-        # Check for low attendance and send notification
-        if status == 'absent':
-            student = Student.query.get(student_id)
-            percentage = calculate_attendance_percentage(student_id, session_obj.class_id)
-            
-            if percentage < 75:
-                # Create notification for student
-                notification = Notification(
-                    user_id=student.user_id,
-                    title='⚠️ Low Attendance Alert',
-                    message=f'Your attendance in {session_obj.class_ref.course.course_name} has dropped to {percentage}%. You need to maintain at least 75% attendance to be eligible for exams. Please attend classes regularly.',
-                    type='low_attendance'
-                )
-                db.session.add(notification)
-                db.session.commit()
-        
         log_audit('Mark Attendance', 'Attendance', attendance_id, 
                  f'Marked {status} for student {student_id} in session {session_id}')
         
@@ -1212,20 +1182,9 @@ def student_dashboard():
             'percentage': percentage
         })
     
-    # Get unread notifications
-    unread_count = Notification.query.filter_by(
-        user_id=session['user_id'],
-        is_read=False
-    ).count()
-    
-    notifications = Notification.query.filter_by(user_id=session['user_id'])\
-                                     .order_by(Notification.created_at.desc()).limit(5).all()
-    
     return render_template('student/dashboard.html',
                          student=student,
-                         attendance_summary=attendance_summary,
-                         notifications=notifications,
-                         unread_count=unread_count)
+                         attendance_summary=attendance_summary)
 
 @app.route('/student/attendance')
 @role_required('student')
@@ -1262,19 +1221,6 @@ def student_class_attendance(class_id):
                          class_obj=class_obj,
                          records=records,
                          percentage=percentage)
-
-@app.route('/student/notifications')
-@role_required('student')
-def student_notifications():
-    notifications = Notification.query.filter_by(user_id=session['user_id'])\
-                                     .order_by(Notification.created_at.desc()).all()
-    
-    # Mark all as read
-    for notif in notifications:
-        notif.is_read = True
-    db.session.commit()
-    
-    return render_template('student/notifications.html', notifications=notifications)
 
 # ==================== API ROUTES ====================
 
