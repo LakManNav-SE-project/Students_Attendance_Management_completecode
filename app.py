@@ -1575,7 +1575,6 @@ def init_db():
             print(f"  ✓ Enrollments: {Enrollment.query.count()}")
             print(f"  ✓ Attendance Sessions: {AttendanceSession.query.count()}")
             print(f"  ✓ Attendance Records: {Attendance.query.count()}")
-            print(f"  ✓ Notifications: {Notification.query.count()}")
             
             print("\n🎓 Structure:")
             print("  • 6 Sections (A, B = Year 1; C, D = Year 2; E, F = Year 3)")
