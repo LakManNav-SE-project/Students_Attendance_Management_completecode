@@ -38,22 +38,24 @@
                 <thead style="background-color: #cfe2ff;">
                     <tr>
                         <th width="15%" style="color: #084298;">Course Code</th>
-                        <th width="35%" style="color: #084298;">Course Name</th>
+                        <th width="30%" style="color: #084298;">Course Name</th>
                         <th width="10%" style="color: #084298;">Credits</th>
                         <th width="10%" style="color: #084298;">Year</th>
                         <th width="10%" style="color: #084298;">Semester</th>
-                        <th width="20%" style="color: #084298;">Info</th>
+                        <th width="15%" style="color: #084298;">Info</th>
+                        <th width="10%" style="color: #084298;">Actions</th>
                     </tr>
                 </thead>
                 {% else %}
                 <thead style="background-color: #d1e7dd;">
                     <tr>
                         <th width="15%" style="color: #0f5132;">Course Code</th>
-                        <th width="35%" style="color: #0f5132;">Course Name</th>
+                        <th width="30%" style="color: #0f5132;">Course Name</th>
                         <th width="10%" style="color: #0f5132;">Credits</th>
                         <th width="10%" style="color: #0f5132;">Year</th>
                         <th width="10%" style="color: #0f5132;">Semester</th>
-                        <th width="20%" style="color: #0f5132;">Info</th>
+                        <th width="15%" style="color: #0f5132;">Info</th>
+                        <th width="10%" style="color: #0f5132;">Actions</th>
                     </tr>
                 </thead>
                 {% endif %}
@@ -67,6 +69,13 @@
                         <td>Sem {{ course.semester }}</td>
                         <td>
                             <span class="badge bg-secondary">{{ department }}</span>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_delete_course', course_id=course.id) }}" style="display:inline;" onsubmit="return confirm('⚠️ WARNING!\n\nAre you sure you want to delete course {{ course.course_code }} ({{ course.course_name }})?\n\nThis will:\n- Delete the course\n- Delete ALL classes using this course\n- Delete ALL enrollments in those classes\n\nThis action CANNOT be undone!');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

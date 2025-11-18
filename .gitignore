@@ -24,6 +24,9 @@ Thumbs.db
 # Tooling
 .vscode/
 .idea/
+htmlcov/
+.coverage
+coverage.xml
 
 # Local scripts/logs
 *.log

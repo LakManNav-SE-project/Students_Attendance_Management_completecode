@@ -1,0 +1,16 @@
+[run]
+branch = True
+source = .
+omit =
+    tests/*
+    se/*
+    .venv/*
+    instance/*
+    initialize_test_database.py
+    migrate_database.py
+    run.sh
+
+[report]
+show_missing = True
+skip_covered = True
+precision = 2

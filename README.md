@@ -193,14 +193,20 @@ Automated testing runs in GitHub Actions via `.github/workflows/ci.yml` whenever
 
 - **Environment:** Ubuntu runner with Python 3.12
 - **Dependencies:** Cached `pip` install from `requirements.txt`
-- **Validation:** Executes the entire pytest suite (`python -m pytest tests/ -v --maxfail=1 --disable-warnings`)
-- **Artifacts:** On failure, uploads `.pytest_cache` to help with debugging
+- **Validation:** Executes the pytest suite with coverage enabled (`python -m pytest tests/ -v --maxfail=1 --disable-warnings --cov=. --cov-branch`)
+- **Artifacts:** Always uploads the generated `coverage.xml` and `htmlcov/` HTML report plus `.pytest_cache` on failure for easy inspection
 
-To verify locally before pushing, run:
+To verify locally before pushing (and produce the same coverage reports), run:
 
 ```bash
-python -m pytest tests/ -v --maxfail=1 --disable-warnings
+python -m pytest tests/ -v --maxfail=1 --disable-warnings \
+  --cov=. --cov-branch \
+  --cov-report=term-missing \
+  --cov-report=xml \
+  --cov-report=html
 ```
+
+The above command writes an interactive HTML report to `htmlcov/index.html` and a machine-readable `coverage.xml` file that can be consumed by quality gates or IDE plugins.
 
 ## Containerized Deployment
 
