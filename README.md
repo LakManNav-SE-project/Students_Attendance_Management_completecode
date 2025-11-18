@@ -5,27 +5,25 @@ A comprehensive Flask-based web application for managing student attendance with
 ## Features
 
 ### Admin Features
-- ✅ User Management (Create, View, Delete users)
-- ✅ Course Management
-- ✅ Class Management
-- ✅ Comprehensive Attendance Reports
-- ✅ System Audit Logs
-- ✅ Dashboard with Statistics
+-  User Management (Create, View, Delete users)
+-  Course Management
+-  Class Management
+-  Comprehensive Attendance Reports
+-  System Audit Logs
+-  Dashboard with Statistics
 
 ### Faculty Features
-- ✅ Create Attendance Sessions
-- ✅ Generate QR Codes for attendance
-- ✅ Manual Attendance Marking
-- ✅ View Class Details and Student Lists
-- ✅ Export Reports (CSV, PDF)
-- ✅ Class-wise Attendance Analytics
+-  Create Attendance Sessions
+-  Generate QR Codes for attendance
+-  Manual Attendance Marking
+-  View Class Details and Student Lists
+-  Export Reports (CSV, PDF)
+-  Class-wise Attendance Analytics
 
 ### Student Features
-- ✅ View Attendance Summary
-- ✅ Scan QR Codes to mark attendance
-- ✅ Detailed Attendance History
-- ✅ Notifications for low attendance
-- ✅ Course-wise Attendance Breakdown
+-  View Attendance Summary
+-  Detailed Attendance History
+-  Course-wise Attendance Breakdown
 
 ## Installation
 
@@ -167,12 +165,12 @@ Then uncomment the email sending code in the `send_email()` function.
 
 ## Security Features
 
-- ✅ Password hashing using Werkzeug's security functions
-- ✅ Session management with CSRF protection
-- ✅ Role-based access control decorators
-- ✅ SQL injection prevention via SQLAlchemy ORM
-- ✅ XSS protection through template escaping
-- ✅ Audit logging for compliance
+-  Password hashing using Werkzeug's security functions
+-  Session management with CSRF protection
+-  Role-based access control decorators
+-  SQL injection prevention via SQLAlchemy ORM
+-  XSS protection through template escaping
+-  Audit logging for compliance
 
 ## Customization
 
@@ -284,4 +282,4 @@ Educational use only. Part of academic coursework.
 
 ## Version History
 
-- v1.0 (2025) - Initial release with full CRUD operations, reporting, and QR code attendance
+- v1.0 (2025) - Initial release with full CRUD operations and reporting
