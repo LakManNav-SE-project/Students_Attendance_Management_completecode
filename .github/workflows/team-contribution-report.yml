@@ -1,0 +1,68 @@
+name: Team Contribution Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+
+permissions:
+  contents: read
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate contribution statistics
+        run: |
+          echo "# Team Contribution Report" > report.md
+          echo "" >> report.md
+          echo "**Repository:** ${{ github.repository }}" >> report.md
+          echo "**Generated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> report.md
+          echo "" >> report.md
+          
+          echo "## Team Members" >> report.md
+          echo "" >> report.md
+          
+          # Get all contributors
+          git log --all --format='%aN|%aE' | sort -u > contributors.txt
+          
+          echo "| Member | Commits | Files Changed | Additions | Deletions |" >> report.md
+          echo "|--------|---------|---------------|-----------|-----------|" >> report.md
+          
+          while IFS='|' read -r name email; do
+            commits=$(git log --all --author="$email" --oneline | wc -l)
+            stats=$(git log --all --author="$email" --numstat --pretty="%H" | awk 'NF==3 {plus+=$1; minus+=$2} END {printf("%d\t%d", plus, minus)}')
+            files=$(git log --all --author="$email" --name-only --pretty=format: | sort -u | grep -v '^$' | wc -l)
+            additions=$(echo "$stats" | cut -f1)
+            deletions=$(echo "$stats" | cut -f2)
+            
+            echo "| $name | $commits | $files | $additions | $deletions |" >> report.md
+          done < contributors.txt
+          
+          echo "" >> report.md
+          echo "## Detailed Profiles" >> report.md
+          
+          while IFS='|' read -r name email; do
+            echo "" >> report.md
+            echo "### $name" >> report.md
+            echo "" >> report.md
+            echo "**Email:** $email" >> report.md
+            echo "" >> report.md
+            echo "**Recent Commits:**" >> report.md
+            git log --all --author="$email" --oneline -5 --pretty=format:"- \`%h\` %s (%ar)" >> report.md
+            echo "" >> report.md
+            echo "" >> report.md
+          done < contributors.txt
+          
+          cat report.md
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: team-contribution-report
+          path: report.md
