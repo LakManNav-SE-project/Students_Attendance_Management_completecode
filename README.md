@@ -1,6 +1,6 @@
 # SAMS - Student Attendance Management System
 
-A comprehensive Flask-based web application for managing student attendance with role-based access control, QR code scanning, and detailed reporting.
+A comprehensive Flask-based web application for managing student attendance with role-based access control,  and detailed reporting.
 
 ## Features
 
@@ -14,7 +14,6 @@ A comprehensive Flask-based web application for managing student attendance with
 
 ### Faculty Features
 -  Create Attendance Sessions
--  Generate QR Codes for attendance
 -  Manual Attendance Marking
 -  View Class Details and Student Lists
 -  Export Reports (CSV, PDF)
@@ -94,8 +93,6 @@ sams/
 │       ├── dashboard.html
 │       ├── attendance.html
 │       ├── class_attendance.html
-│       ├── scan_qr.html
-│       └── notifications.html
 └── static/                         # Static files
     └── css/
         └── style.css               # Custom CSS
@@ -110,27 +107,17 @@ sams/
 - Secure session management with 30-minute timeout
 
 ### 2. Attendance Management
-- Multiple methods: Manual marking, QR code scanning
+- Manual marking
 - Real-time attendance tracking
-- Automated absence notifications
 
-### 3. QR Code System
-- Faculty can generate time-limited QR codes
-- Students scan QR codes to mark attendance
-- QR codes expire after 1 hour for security
-
-### 4. Reporting & Analytics
+### 3. Reporting & Analytics
 - Comprehensive attendance reports
 - Export to CSV and PDF formats
 - Class-wise and student-wise analytics
 - Attendance percentage calculations
 
-### 5. Notification System
-- Low attendance warnings (< 75%)
-- Email notifications to parents
-- In-app notifications for students
 
-### 6. Audit Logging
+### 4. Audit Logging
 - All user actions are logged
 - IP address tracking
 - Timestamp for every action
@@ -147,21 +134,8 @@ The application uses SQLite with the following main tables:
 - **enrollments**: Student-class enrollments
 - **attendance_sessions**: Attendance session metadata
 - **attendance**: Individual attendance records
-- **notifications**: User notifications
 - **audit_logs**: System audit trail
 
-## Email Configuration
-
-To enable email notifications, configure SMTP settings in `app.py`:
-
-```python
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-SMTP_USERNAME = "your_email@gmail.com"
-SMTP_PASSWORD = "your_app_password"
-```
-
-Then uncomment the email sending code in the `send_email()` function.
 
 ## Security Features
 
