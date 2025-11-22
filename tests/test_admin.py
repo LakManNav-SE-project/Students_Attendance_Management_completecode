@@ -137,6 +137,45 @@ class TestAdminUserManagement:
         
         assert response.status_code == 200
         assert b'already exists' in response.data.lower() or b'error' in response.data.lower()
+    
+    def test_delete_student_user(self, admin_client, app):
+        """Test admin can delete student user"""
+        # First create a user to delete
+        with app.app_context():
+            user = User(
+                username='todelete',
+                password_hash='hash',
+                email='delete@test.com',
+                role='student',
+                full_name='To Delete'
+            )
+            db.session.add(user)
+            db.session.commit()
+            user_id = user.id
+            
+            student = Student(
+                user_id=user_id,
+                student_id='DEL001',
+                section='A',
+                year=1,
+                department='CS'
+            )
+            db.session.add(student)
+            db.session.commit()
+        
+        # Delete the user
+        response = admin_client.post(f'/admin/users/{user_id}/delete', 
+                                     follow_redirects=True)
+        
+        assert response.status_code == 200
+        
+        # Verify user was deleted
+        with app.app_context():
+            user = User.query.get(user_id)
+            assert user is None
+            
+            student = Student.query.filter_by(user_id=user_id).first()
+            assert student is None
 
 
 class TestAdminCourseManagement:

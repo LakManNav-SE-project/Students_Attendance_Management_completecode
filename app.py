@@ -189,7 +189,7 @@ def log_audit(action, entity_type=None, entity_id=None, details=None):
     except:
         pass
 
-def send_email(to_email, subject, body):  # pragma: no cover
+def send_email(to_email, subject, body):
     try:
         SMTP_SERVER = "smtp.gmail.com"
         SMTP_PORT = 587
@@ -710,14 +710,14 @@ def admin_add_class():
     faculty = Faculty.query.all()
     return render_template('admin/add_class.html', courses=courses, faculty=faculty)
 
-@app.route('/admin/reports')  # pragma: no cover
+@app.route('/admin/reports')
 @role_required('admin')
-def admin_reports():  # pragma: no cover
+def admin_reports():
     return render_template('admin/reports.html')
 
-@app.route('/admin/reports/attendance')  # pragma: no cover
+@app.route('/admin/reports/attendance')
 @role_required('admin')
-def admin_attendance_report():  # pragma: no cover
+def admin_attendance_report():
     course_id = request.args.get('course_id', type=int)
     department = request.args.get('department')
     start_date = request.args.get('start_date')
@@ -771,7 +771,7 @@ def admin_attendance_report():  # pragma: no cover
                          courses=courses,
                          departments=[d[0] for d in departments])
 
-@app.route('/admin/reports/attendance/download')  # pragma: no cover
+@app.route('/admin/reports/attendance/download')
 @role_required('admin')
 def admin_download_report():
     course_id = request.args.get('course_id', type=int)
@@ -1042,18 +1042,18 @@ def faculty_mark_attendance():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 400
 
-@app.route('/faculty/reports')  # pragma: no cover
+@app.route('/faculty/reports')
 @role_required('faculty')
-def faculty_reports():  # pragma: no cover
+def faculty_reports():
     faculty = get_current_faculty()
     if not faculty:
         return redirect(url_for('login'))
     my_classes = Class.query.filter_by(faculty_id=faculty.id).all()
     return render_template('faculty/reports.html', classes=my_classes)
 
-@app.route('/faculty/reports/class/<int:class_id>')  # pragma: no cover
+@app.route('/faculty/reports/class/<int:class_id>')
 @role_required('faculty')
-def faculty_class_report(class_id):  # pragma: no cover
+def faculty_class_report(class_id):
     class_obj = Class.query.get_or_404(class_id)
     
     faculty = get_current_faculty()
@@ -1094,9 +1094,9 @@ def faculty_class_report(class_id):  # pragma: no cover
                          class_obj=class_obj,
                          report_data=report_data)
 
-@app.route('/faculty/export/csv/<int:class_id>')  # pragma: no cover
+@app.route('/faculty/export/csv/<int:class_id>')
 @role_required('faculty')
-def faculty_export_csv(class_id):  # pragma: no cover
+def faculty_export_csv(class_id):
     class_obj = Class.query.get_or_404(class_id)
     
     faculty = get_current_faculty()
@@ -1148,9 +1148,9 @@ def faculty_export_csv(class_id):  # pragma: no cover
         download_name=f'attendance_report_{class_obj.course.course_code}.csv'
     )
 
-@app.route('/faculty/export/pdf/<int:class_id>')  # pragma: no cover
+@app.route('/faculty/export/pdf/<int:class_id>')
 @role_required('faculty')
-def faculty_export_pdf(class_id):  # pragma: no cover
+def faculty_export_pdf(class_id):
     class_obj = Class.query.get_or_404(class_id)
     
     faculty = get_current_faculty()
@@ -1320,7 +1320,7 @@ def student_class_attendance(class_id):
 
 @app.route('/api/attendance/update', methods=['POST'])
 @role_required('faculty')
-def api_update_attendance():  # pragma: no cover
+def api_update_attendance():
     """API endpoint for faculty to update attendance after it's been marked"""
     try:
         data = request.get_json()
@@ -1363,7 +1363,7 @@ def api_update_attendance():  # pragma: no cover
 
 @app.route('/api/attendance/finalize/<int:session_id>', methods=['POST'])
 @role_required('faculty')
-def api_finalize_attendance(session_id):  # pragma: no cover
+def api_finalize_attendance(session_id):
     """Finalize attendance session - locks it from further edits"""
     try:
         session_obj = AttendanceSession.query.get_or_404(session_id)

@@ -191,3 +191,66 @@ def student_client(client, init_database, app):
             sess['user_id'] = 3  # Student user ID
             sess['_fresh'] = True
     return client
+
+
+@pytest.fixture
+def app_context(app):
+    """Provide application context"""
+    with app.app_context():
+        yield app
+
+
+@pytest.fixture
+def admin_user(app):
+    """Get admin user"""
+    with app.app_context():
+        from app import User
+        return User.query.filter_by(role='admin').first()
+
+
+@pytest.fixture
+def sample_faculty_user(app):
+    """Get faculty user"""
+    with app.app_context():
+        from app import User
+        return User.query.filter_by(role='faculty').first()
+
+
+@pytest.fixture
+def sample_student_user(app):
+    """Get student user"""
+    with app.app_context():
+        from app import User
+        return User.query.filter_by(role='student').first()
+
+
+@pytest.fixture
+def sample_faculty(app, init_database):
+    """Get faculty record"""
+    with app.app_context():
+        from app import Faculty
+        return Faculty.query.first()
+
+
+@pytest.fixture
+def sample_student(app, init_database):
+    """Get student record"""
+    with app.app_context():
+        from app import Student
+        return Student.query.first()
+
+
+@pytest.fixture
+def sample_course(app, init_database):
+    """Get course record"""
+    with app.app_context():
+        from app import Course
+        return Course.query.first()
+
+
+@pytest.fixture
+def sample_class(app, init_database):
+    """Get class record"""
+    with app.app_context():
+        from app import Class
+        return Class.query.first()
