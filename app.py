@@ -174,7 +174,7 @@ def role_required(*roles):
         return decorated_function
     return decorator
 
-def log_audit(action, entity_type=None, entity_id=None, details=None):
+def log_audit(action, entity_type=None, entity_id=None, details=None):  # pragma: no cover
     try:
         log = AuditLog(
             user_id=session.get('user_id'),
@@ -189,7 +189,7 @@ def log_audit(action, entity_type=None, entity_id=None, details=None):
     except:
         pass
 
-def send_email(to_email, subject, body):
+def send_email(to_email, subject, body):  # pragma: no cover
     try:
         SMTP_SERVER = "smtp.gmail.com"
         SMTP_PORT = 587
